@@ -26,6 +26,12 @@ resource "aws_rds_cluster" "cluster" {
   tags = {
     "Managed By Terraform" = ""
   }
+
+  lifecycle {
+    ignore_changes = [
+      master_password
+    ]
+  }
 }
 
 resource "aws_rds_cluster_instance" "instance" {
