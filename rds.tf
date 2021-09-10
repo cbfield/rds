@@ -2,7 +2,7 @@ resource "aws_rds_cluster" "cluster" {
   allow_major_version_upgrade         = var.allow_major_version_upgrade
   apply_immediately                   = var.apply_immediately
   backup_retention_period             = var.backup_retention_period
-  cluster_identifier_prefix           = var.cluster_identifier_prefix
+  cluster_identifier                  = var.cluster_identifier
   copy_tags_to_snapshot               = true
   database_name                       = var.database_name
   db_subnet_group_name                = var.existing_subnet_group == "" ? var.existing_subnet_group : aws_db_subnet_group.subnet_group.0.name
@@ -18,6 +18,7 @@ resource "aws_rds_cluster" "cluster" {
   master_password                     = random_password.admin_password.result
   master_username                     = "administrator"
   preferred_backup_window             = "01:00-01:30"
+  preferred_maintenance_window        = "sun:01:00-sun:01:30"
   skip_final_snapshot                 = true
   storage_encrypted                   = true
   vpc_security_group_ids              = [aws_security_group.cluster_security_group.id]
@@ -27,10 +28,34 @@ resource "aws_rds_cluster" "cluster" {
   }
 }
 
+resource "aws_rds_cluster_instance" "instance" {
+  count = var.instance_count
+
+  identifier_prefix               = var.cluster_identifier
+  cluster_identifier              = var.cluster_identifier
+  engine                          = var.engine
+  engine_version                  = var.engine_version
+  instance_class                  = var.instance_class
+  db_subnet_group_name            = var.existing_subnet_group == "" ? aws_db_subnet_group.subnet_group.0.name : var.existing_subnet_group
+  apply_immediately               = true
+  monitoring_role_arn             = var.enhanced_monitoring_interval == 0 ? aws_iam_role.enhanced_monitoring_role.0.arn : null
+  monitoring_interval             = var.enhanced_monitoring_interval
+  preferred_backup_window         = "01:00-01:30"
+  preferred_maintenance_window    = "sun:01:00-sun:01:30"
+  auto_minor_version_upgrade      = var.auto_minor_version_upgrade
+  performance_insights_enabled    = var.performance_insights_enabled
+  performance_insights_kms_key_id = var.performance_insights_enabled ? aws_kms_key.encryption_key.arn : null
+  copy_tags_to_snapshot           = true
+
+  tags = {
+    "Managed By Terraform" = ""
+  }
+}
+
 resource "aws_db_subnet_group" "subnet_group" {
   count = var.existing_subnet_group == "" ? 1 : 0
 
-  name       = "${var.cluster_identifier_prefix}-subnet-group"
+  name       = "${var.cluster_identifier}-subnet-group"
   subnet_ids = var.subnets
 
   tags = {

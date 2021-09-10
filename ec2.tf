@@ -1,5 +1,5 @@
 resource "aws_security_group" "cluster_security_group" {
-  name        = var.cluster_identifier_prefix
+  name        = var.cluster_identifier
   description = "Allow database connections from trusted resources only"
   vpc_id      = var.vpc_id
 }

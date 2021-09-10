@@ -16,13 +16,19 @@ variable "apply_immediately" {
   default     = true
 }
 
+variable "auto_minor_version_upgrade" {
+  description = "Whether to allow the minor version of the database engine to be upgrade during maintenance windows. Upgrades incur downtime"
+  type        = bool
+  default     = false
+}
+
 variable "backup_retention_period" {
   description = "The number of days for which automated database backups are retained"
   type        = number
   default     = 7
 }
 
-variable "cluster_identifier_prefix" {
+variable "cluster_identifier" {
   description = "A prefix for the identifer of the cluster. Will be prepended to a random string to ensure a unique name"
   type        = string
 }
@@ -69,6 +75,12 @@ variable "engine_version" {
   default     = "9.6.3"
 }
 
+variable "enhanced_monitoring_interval" {
+  description = "The interval (in seconds) to send enhanced monitoring metrics to Cloudwatch. Set to 0 to disable enhanced monitoring"
+  type        = number
+  default     = 5
+}
+
 variable "existing_subnet_group" {
   description = "The name of an existing subnet group to use. If not provided, one will be created"
   type        = string
@@ -85,6 +97,24 @@ variable "iam_roles" {
   description = "IAM roles (arns) to associate with the cluster"
   type        = list(string)
   default     = []
+}
+
+variable "instance_class" {
+  description = "Instance class used to create cluster instances"
+  type        = string
+  default     = "db.m6g"
+}
+
+variable "instance_count" {
+  description = "The number of instances to create within the cluster"
+  type        = number
+  default     = 1
+}
+
+variable "performance_insights_enabled" {
+  description = "Whether to enable performance insights"
+  type        = bool
+  default     = true
 }
 
 variable "subnets" {

@@ -1,5 +1,5 @@
 resource "aws_kms_key" "encryption_key" {
-  description = "Encrypts the contents of the RDS cluster '${var.cluster_identifier_prefix}'"
+  description = "Encrypts the contents of the RDS cluster '${var.cluster_identifier}'"
   policy = templatefile("${path.module}/templates/kms-key-policy.json.tpl", {
     account_id = data.aws_caller_identity.current.account_id
   })
@@ -11,6 +11,6 @@ resource "aws_kms_key" "encryption_key" {
 }
 
 resource "aws_kms_alias" "encryption_key_alias" {
-  name          = "alias/${var.cluster_identifier_prefix}-encryption-key"
+  name          = "alias/${var.cluster_identifier}-encryption-key"
   target_key_id = aws_kms_key.encryption_key.key_id
 }
