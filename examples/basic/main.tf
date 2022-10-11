@@ -1,5 +1,5 @@
 module "my_rds_db" {
-  source = "../"
+  source = "../../"
 
   cluster_identifier = "my-rds-cluster"
 
